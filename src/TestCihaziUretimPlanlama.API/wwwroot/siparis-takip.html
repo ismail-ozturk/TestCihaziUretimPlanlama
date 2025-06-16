@@ -1,0 +1,2054 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sipariş Takip Sistemi - Test Cihazı Üretim Planlama</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dhtmlx-gantt@8.0.6/codebase/dhtmlxgantt.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/dhtmlx-gantt@8.0.6/codebase/dhtmlxgantt.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1e293b;
+            --light-color: #f8fafc;
+        }
+
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .card-custom {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+            .card-custom:hover {
+                transform: translateY(-5px);
+            }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 15px;
+        }
+
+        .stat-card-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .stat-card-warning {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .stat-card-info {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .btn-custom {
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+            .btn-custom:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            }
+
+        .table-custom {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+            .table-custom thead {
+                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+                color: white;
+            }
+
+        .progress-custom {
+            height: 25px;
+            border-radius: 15px;
+            background-color: #e9ecef;
+        }
+
+        .progress-bar-custom {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 15px;
+        }
+
+        .status-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-beklemede {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-basladi {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-devam-ediyor {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-tamamlandi {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-bekletildi {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-iptal {
+            background-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .nav-tabs-custom .nav-link {
+            border: none;
+            border-radius: 25px 25px 0 0;
+            margin-right: 5px;
+            background: #f8f9fa;
+            color: #6c757d;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+            .nav-tabs-custom .nav-link.active {
+                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+                color: white;
+            }
+
+            .nav-tabs-custom .nav-link:hover {
+                background: #e9ecef;
+                color: #495057;
+            }
+
+            .nav-tabs-custom .nav-link.active:hover {
+                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+                color: white;
+            }
+
+        .form-control-custom {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+            .form-control-custom:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            }
+
+        .modal-custom .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+
+        .modal-custom .modal-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 20px;
+        }
+
+            .timeline-item::before {
+                content: '';
+                position: absolute;
+                left: 10px;
+                top: 5px;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: var(--primary-color);
+            }
+
+            .timeline-item::after {
+                content: '';
+                position: absolute;
+                left: 14px;
+                top: 15px;
+                width: 2px;
+                height: calc(100% + 5px);
+                background: #e9ecef;
+            }
+
+            .timeline-item:last-child::after {
+                display: none;
+            }
+
+        .gantt-container {
+            height: 400px;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            min-width: 300px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+            .search-container .form-control {
+                padding-left: 40px;
+            }
+
+            .search-container .search-icon {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #6c757d;
+            }
+
+        .priority-high {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .priority-medium {
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .priority-low {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .task-row {
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .department-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .department-card:hover {
+                background-color: #f8f9fa;
+            }
+
+            .department-card.selected {
+                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+                color: white;
+            }
+
+        .personnel-item {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .personnel-item:hover {
+                background-color: #e9ecef;
+            }
+
+            .personnel-item.selected {
+                background-color: var(--primary-color);
+                color: white;
+            }
+
+        .competency-badge {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin: 2px;
+        }
+
+        .shift-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .shift-normal {
+            background-color: #28a745;
+        }
+
+        .shift-a {
+            background-color: #007bff;
+        }
+
+        .shift-b {
+            background-color: #ffc107;
+        }
+
+        .shift-gunduz {
+            background-color: #17a2b8;
+        }
+
+        .category-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .category-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            }
+
+            .category-card.selected {
+                border: 2px solid var(--primary-color);
+                background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fas fa-industry me-2"></i>
+                Test Cihazı Üretim Planlama
+            </a>
+
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-light btn-sm me-2" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i> Yenile
+                </button>
+                <div class="dropdown">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i> Admin
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-home me-2"></i>Ana Sayfa</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Çıkış</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="fw-bold mb-0">
+                    <i class="fas fa-clipboard-list me-2" style="color: var(--primary-color);"></i>
+                    Sipariş Takip Sistemi
+                </h2>
+                <p class="text-muted">Sipariş yönetimi, detay görüntüleme ve planlama merkezi</p>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title opacity-75">Toplam Sipariş</h6>
+                                <h3 class="mb-0" id="totalOrders">0</h3>
+                            </div>
+                            <i class="fas fa-shopping-cart fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card-success">
+                    <div class="card-body text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title opacity-75">Tamamlanan</h6>
+                                <h3 class="mb-0" id="completedOrders">0</h3>
+                            </div>
+                            <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card-warning">
+                    <div class="card-body text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title opacity-75">Devam Eden</h6>
+                                <h3 class="mb-0" id="inProgressOrders">0</h3>
+                            </div>
+                            <i class="fas fa-cogs fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card-info">
+                    <div class="card-body text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title opacity-75">Beklemede</h6>
+                                <h3 class="mb-0" id="pendingOrders">0</h3>
+                            </div>
+                            <i class="fas fa-clock fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="card card-custom">
+            <div class="card-header bg-white border-0">
+                <ul class="nav nav-tabs nav-tabs-custom" id="orderTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" role="tab">
+                            <i class="fas fa-list me-2"></i>Sipariş Yönetimi
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail" type="button" role="tab">
+                            <i class="fas fa-info-circle me-2"></i>Sipariş Detayı
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="planning-tab" data-bs-toggle="tab" data-bs-target="#planning" type="button" role="tab">
+                            <i class="fas fa-calendar-alt me-2"></i>Planlama
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="statistics-tab" data-bs-toggle="tab" data-bs-target="#statistics" type="button" role="tab">
+                            <i class="fas fa-chart-bar me-2"></i>İstatistikler
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card-body">
+                <div class="tab-content" id="orderTabContent">
+                    <!-- Sipariş Yönetimi Tab -->
+                    <div class="tab-pane fade show active" id="orders" role="tabpanel">
+                        <div class="row">
+                            <!-- Sol Panel - Departmanlar -->
+                            <div class="col-md-3">
+                                <div class="card card-custom">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"><i class="fas fa-building me-2"></i>Departmanlar</h6>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div id="departmentList">
+                                            <div class="p-3 text-center text-muted">
+                                                <i class="fas fa-building fa-2x mb-2"></i>
+                                                <p class="mb-0">Departmanlar yükleniyor...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card card-custom mt-3">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"><i class="fas fa-users me-2"></i>Personeller</h6>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div id="personnelList">
+                                            <div class="p-3 text-center text-muted">
+                                                <i class="fas fa-users fa-2x mb-2"></i>
+                                                <p class="mb-0">Departman seçin</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Orta Panel - Kategoriler ve Görevler -->
+                            <div class="col-md-6">
+                                <div class="card card-custom">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"><i class="fas fa-tags me-2"></i>Kategoriler</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row" id="categoryList">
+                                            <div class="col-12 text-center text-muted py-4">
+                                                <i class="fas fa-tags fa-2x mb-2"></i>
+                                                <p class="mb-0">Kategoriler yükleniyor...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card card-custom mt-3">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"><i class="fas fa-tasks me-2"></i>Görevler</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="taskList">
+                                            <div class="text-center text-muted py-4">
+                                                <i class="fas fa-tasks fa-2x mb-2"></i>
+                                                <p class="mb-0">Kategori seçin</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sağ Panel - Sipariş Formu -->
+                            <div class="col-md-3">
+                                <div class="card card-custom">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Yeni Sipariş</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="orderForm">
+                                            <div class="mb-3">
+                                                <label class="form-label">Üretim Numarası</label>
+                                                <input type="text" class="form-control form-control-custom" id="uretimNumarasi" required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Müşteri</label>
+                                                <select class="form-select form-control-custom" id="customerSelect" required>
+                                                    <option value="">Müşteri Seçin</option>
+                                                    <option value="1">Türkiye</option>
+                                                    <option value="2">Almanya</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">İstenilen Başlangıç Tarihi</label>
+                                                <input type="datetime-local" class="form-control form-control-custom" id="startDate" required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Son Teslim Tarihi</label>
+                                                <input type="datetime-local" class="form-control form-control-custom" id="endDate">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Öncelik (1-10)</label>
+                                                <input type="number" class="form-control form-control-custom" id="oncelik" min="1" max="10" value="5">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Notlar</label>
+                                                <textarea class="form-control form-control-custom" id="orderDescription" rows="3"></textarea>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="kategoriSablonuKullan" checked>
+                                                    <label class="form-check-label" for="kategoriSablonuKullan">
+                                                        Kategori Şablonu Kullan
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="alert alert-info">
+                                                <small><i class="fas fa-info-circle me-1"></i>Kategori seçtikten sonra görevler otomatik yüklenecektir.</small>
+                                            </div>
+
+                                            <button type="submit" class="btn btn-primary btn-custom w-100">
+                                                <i class="fas fa-plus me-2"></i>Sipariş Oluştur
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sipariş Listesi -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card card-custom">
+                                    <div class="card-header">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-0"><i class="fas fa-list me-2"></i>Sipariş Listesi</h6>
+                                            <div class="search-container">
+                                                <i class="fas fa-search search-icon"></i>
+                                                <input type="text" class="form-control form-control-custom" id="searchInput" placeholder="Sipariş ara...">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover table-custom">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Üretim No</th>
+                                                        <th>Müşteri</th>
+                                                        <th>Kategori</th>
+                                                        <th>Durum</th>
+                                                        <th>Başlangıç</th>
+                                                        <th>Son Teslim</th>
+                                                        <th>Öncelik</th>
+                                                        <th>İşlemler</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="ordersTableBody">
+                                                    <tr>
+                                                        <td colspan="8" class="text-center text-muted py-4">
+                                                            <i class="fas fa-spinner fa-spin me-2"></i>Siparişler yükleniyor...
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sipariş Detayı Tab -->
+                    <div class="tab-pane fade" id="detail" role="tabpanel">
+                        <div id="orderDetailContent">
+                            <div class="text-center py-5">
+                                <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">Detayını görüntülemek için bir sipariş seçin</h5>
+                                <button class="btn btn-outline-primary btn-custom mt-3" onclick="switchToOrdersTab()">
+                                    <i class="fas fa-arrow-left me-2"></i>Sipariş Listesine Dön
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Planlama Tab -->
+                    <div class="tab-pane fade" id="planning" role="tabpanel">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card card-custom">
+                                    <div class="card-header">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Üretim Planı - Gantt Chart</h6>
+                                            <button class="btn btn-primary btn-custom" onclick="planAllOrders()">
+                                                <i class="fas fa-play me-2"></i>Tüm Siparişleri Planla
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="gantt_here" class="gantt-container"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- İstatistikler Tab -->
+                    <div class="tab-pane fade" id="statistics" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card card-custom">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Sipariş Durumu Dağılımı</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="statusChart" height="200"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card card-custom">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"><i class="fas fa-chart-line me-2"></i>Aylık Sipariş Trendi</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="trendChart" height="200"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-8">
+                                <div class="card card-custom">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"><i class="fas fa-users me-2"></i>Personel Performansı</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="performanceChart" height="200"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-custom">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"><i class="fas fa-clock me-2"></i>Sistem Durumu</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <span>API Bağlantısı</span>
+                                            <span class="badge bg-success" id="apiStatus">Aktif</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <span>Son Güncelleme</span>
+                                            <span class="badge bg-info" id="lastUpdate">-</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>Toplam İşlem</span>
+                                            <span class="badge bg-primary" id="totalOperations">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yükleniyor...</span>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="notification"></div>
+
+    <!-- Görev Durumu Güncelle Modal -->
+    <div class="modal fade modal-custom" id="taskStatusModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit me-2"></i>Görev Durumu Güncelle
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="taskStatusForm">
+                        <div class="mb-3">
+                            <label class="form-label">Görev</label>
+                            <input type="text" class="form-control form-control-custom" id="taskName" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Yeni Durum</label>
+                            <select class="form-select form-control-custom" id="newStatus" required>
+                                <option value="1">Beklemede</option>
+                                <option value="2">Başladı</option>
+                                <option value="3">Devam Ediyor</option>
+                                <option value="4">Tamamlandı</option>
+                                <option value="5">Bekletildi</option>
+                                <option value="6">İptal</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Açıklama (Opsiyonel)</label>
+                            <textarea class="form-control form-control-custom" id="statusDescription" rows="3" placeholder="Durum değişikliği hakkında açıklama..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary btn-custom" id="updateTaskStatusBtn">
+                        <i class="fas fa-save me-2"></i>Güncelle
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Global Variables
+        let currentOrders = [];
+        let filteredOrders = [];
+        let selectedOrderId = null;
+        let selectedDepartmentId = null;
+        let selectedCategoryId = null;
+        let selectedPersonnel = [];
+        let selectedTasks = [];
+        let departments = [];
+        let categories = [];
+        let personnel = [];
+        let tasks = [];
+
+        // API Base URL
+        const API_BASE_URL = '';
+
+        // Enum mappings
+        const MUSTERI_ENUM = {
+            1: 'Türkiye',
+            2: 'Almanya'
+        };
+
+        const GOREV_DURUM_ENUM = {
+            1: 'Beklemede',
+            2: 'Başladı',
+            3: 'Devam Ediyor',
+            4: 'Tamamlandı',
+            5: 'Bekletildi',
+            6: 'İptal',
+            7: 'Planlandı'
+        };
+
+        const VARDIYA_TIPI_ENUM = {
+            1: 'Normal',
+            2: 'A',
+            3: 'B',
+            4: 'Gündüz'
+        };
+
+        const CALISMA_SEKLI_ENUM = {
+            1: 'Sabit',
+            2: 'Döner'
+        };
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeApp();
+        });
+
+        async function initializeApp() {
+            try {
+                showLoading(true);
+
+                // Load initial data
+                await Promise.all([
+                    loadDepartments(),
+                    loadCategories(),
+                    loadOrders()
+                ]);
+
+                // Initialize components
+                initializeEventListeners();
+                updateLastUpdate();
+
+                showLoading(false);
+                showNotification('Sistem başarıyla yüklendi', 'success');
+                updateApiStatus('success');
+
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showNotification('Sistem yüklenirken hata oluştu: ' + error.message, 'error');
+                updateApiStatus('error');
+                showLoading(false);
+            }
+        }
+
+        // Event Listeners
+        function initializeEventListeners() {
+            // Refresh button
+            document.getElementById('refreshBtn').addEventListener('click', refreshData);
+
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', debounce(filterOrders, 300));
+
+            // Order form
+            document.getElementById('orderForm').addEventListener('submit', handleOrderSubmit);
+
+            // Task status update
+            document.getElementById('updateTaskStatusBtn').addEventListener('click', updateTaskStatus);
+
+            // Tab change events
+            document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+                tab.addEventListener('shown.bs.tab', handleTabChange);
+            });
+
+            // Generate order number
+            generateOrderNumber();
+        }
+
+        // Data Loading Functions
+        async function loadDepartments() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/Departman`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+
+                const responseData = await response.json();
+                departments = extractDataFromResponse(responseData);
+                renderDepartments();
+
+            } catch (error) {
+                console.error('Error loading departments:', error);
+                departments = [];
+                renderDepartments();
+            }
+        }
+
+        async function loadCategories() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/Kategori`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+
+                const responseData = await response.json();
+                categories = extractDataFromResponse(responseData);
+                renderCategories();
+
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                categories = [];
+                renderCategories();
+            }
+        }
+
+        // DÜZELTİLMİŞ
+        async function loadOrders() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/Siparis`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+
+                const responseData = await response.json();
+                currentOrders = extractDataFromResponse(responseData);
+                filteredOrders = [...currentOrders];
+                renderOrdersTable();
+                updateStatistics();
+
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                currentOrders = [];
+                filteredOrders = [];
+                renderOrdersTable();
+                updateStatistics();
+            }
+        }
+
+        // Tüm API response'ları için ortak fonksiyon
+        function extractDataFromResponse(response) {
+            if (!response) return [];
+
+            // Eğer response zaten array ise direkt döndür
+            if (Array.isArray(response)) {
+                return response;
+            }
+
+            // Eğer response object ise ve data property'si varsa onu döndür
+            if (typeof response === 'object' && response.data) {
+                if (Array.isArray(response.data)) {
+                    return response.data;
+                }
+            }
+
+            // Diğer durumlarda boş array döndür
+            return [];
+        }
+
+
+       
+        // DÜZELTİLMİŞ
+        async function loadPersonnelByDepartment(departmentId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/Personel/departman/${departmentId}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+
+                const responseData = await response.json();
+                const personnel = extractDataFromResponse(responseData);
+                renderPersonnel(personnel);
+
+            } catch (error) {
+                console.error('Error loading personnel:', error);
+                renderPersonnel([]);
+            }
+        }
+
+
+        // DÜZELTİLMİŞ
+        async function loadTasksByCategory(categoryId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/Kategori/${categoryId}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+
+                const responseData = await response.json();
+                // Kategori detayından görev şablonlarını al
+                const tasks = responseData.gorevSablonlari || [];
+                renderTasks(tasks);
+
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+                renderTasks([]);
+            }
+        }
+
+
+        // Render Functions
+        function renderDepartments() {
+            const container = document.getElementById('departmentList');
+            container.innerHTML = '';
+
+            if (!departments || departments.length === 0) {
+                container.innerHTML = `
+                            <div class="p-3 text-center text-muted">
+                                <i class="fas fa-building fa-2x mb-2"></i>
+                                <p class="mb-0">Departman bulunamadı</p>
+                            </div>
+                        `;
+                return;
+            }
+
+            departments.forEach(dept => {
+                const deptElement = document.createElement('div');
+                deptElement.className = 'department-card p-3 border-bottom';
+                deptElement.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">${dept.ad}</h6>
+                                    <small class="text-muted">${dept.aciklama || 'Açıklama yok'}</small>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        `;
+
+                deptElement.addEventListener('click', () => selectDepartment(dept.id, deptElement));
+                container.appendChild(deptElement);
+            });
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoryList');
+            container.innerHTML = '';
+
+            if (!categories || categories.length === 0) {
+                container.innerHTML = `
+                            <div class="col-12 text-center text-muted py-4">
+                                <i class="fas fa-tags fa-2x mb-2"></i>
+                                <p class="mb-0">Kategori bulunamadı</p>
+                            </div>
+                        `;
+                return;
+            }
+
+            categories.forEach(category => {
+                const categoryElement = document.createElement('div');
+                categoryElement.className = 'col-md-4 mb-3';
+                categoryElement.innerHTML = `
+                            <div class="card card-custom h-100 category-card" data-category-id="${category.id}">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-microchip fa-2x mb-3" style="color: var(--primary-color);"></i>
+                                    <h6 class="card-title">${category.ad}</h6>
+                                    <p class="card-text text-muted small">${category.aciklama || 'Açıklama yok'}</p>
+                                </div>
+                            </div>
+                        `;
+
+                categoryElement.addEventListener('click', () => selectCategory(category.id, categoryElement.querySelector('.category-card')));
+                container.appendChild(categoryElement);
+            });
+        }
+
+        function renderOrdersTable() {
+            const tbody = document.getElementById('ordersTableBody');
+            tbody.innerHTML = '';
+
+            if (!currentOrders || currentOrders.length === 0) {
+                tbody.innerHTML = `
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                                    Sipariş bulunamadı
+                                </td>
+                            </tr>
+                        `;
+                return;
+            }
+
+            currentOrders.forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                            <td><strong>${order.uretimNumarasi || 'N/A'}</strong></td>
+                            <td><span class="badge bg-secondary">${MUSTERI_ENUM[order.musteri] || 'Bilinmiyor'}</span></td>
+                            <td>${order.kategoriAd || 'N/A'}</td>
+                            <td><span class="status-badge status-${(order.durum || '').toLowerCase().replace(' ', '-')}">${order.durum || 'Bilinmiyor'}</span></td>
+                            <td>${order.istenilenBaslangicTarihi ? formatDate(order.istenilenBaslangicTarihi) : 'N/A'}</td>
+                            <td>${order.sonTeslimTarihi ? formatDate(order.sonTeslimTarihi) : 'N/A'}</td>
+                            <td><span class="badge bg-info">${order.oncelik || 'N/A'}</span></td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary btn-custom" onclick="viewOrderDetail(${order.id})" title="Detay">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline-success btn-custom" onclick="planOrder(${order.id})" title="Planla">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-custom" onclick="deleteOrder(${order.id})" title="İptal">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderPersonnel(personnelList) {
+            const container = document.getElementById('personnelList');
+            container.innerHTML = '';
+
+            if (!personnelList || personnelList.length === 0) {
+                container.innerHTML = `
+                            <div class="p-3 text-center text-muted">
+                                <i class="fas fa-users fa-2x mb-2"></i>
+                                <p class="mb-0">Personel bulunamadı</p>
+                            </div>
+                        `;
+                return;
+            }
+
+            personnelList.forEach(person => {
+                const personElement = document.createElement('div');
+                personElement.className = 'personnel-item';
+                personElement.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">${person.ad} ${person.soyad}</h6>
+                                    <small class="text-muted">${person.personelNo}</small>
+                                    <div class="mt-1">
+                                        <span class="shift-indicator shift-${VARDIYA_TIPI_ENUM[person.sabitVardiyaTipi]?.toLowerCase() || 'normal'}"></span>
+                                        <small>${CALISMA_SEKLI_ENUM[person.calismaSekli]} - ${VARDIYA_TIPI_ENUM[person.sabitVardiyaTipi] || 'Normal'}</small>
+                                    </div>
+                                </div>
+                                <input type="checkbox" class="form-check-input" value="${person.id}">
+                            </div>
+                        `;
+
+                container.appendChild(personElement);
+            });
+        }
+
+        function renderTasks(taskList) {
+            const container = document.getElementById('taskList');
+            container.innerHTML = '';
+
+            if (!taskList || taskList.length === 0) {
+                container.innerHTML = `
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-tasks fa-2x mb-2"></i>
+                                <p class="mb-0">Görev bulunamadı</p>
+                            </div>
+                        `;
+                return;
+            }
+
+            taskList.forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'task-row';
+                taskElement.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">${task.gorev?.ad || 'Görev Adı'}</h6>
+                                    <p class="text-muted mb-1">${task.gorev?.aciklama || 'Açıklama yok'}</p>
+                                    <small class="text-primary">
+                                        <i class="fas fa-clock me-1"></i>
+                                        ${task.ozelSure || task.gorev?.sure || 0} dakika
+                                    </small>
+                                    <small class="ms-3 text-info">
+                                        <i class="fas fa-sort-numeric-up me-1"></i>
+                                        Sıra: ${task.sira}
+                                    </small>
+                                </div>
+                                <input type="checkbox" class="form-check-input task-checkbox" value="${task.gorevId}" checked>
+                            </div>
+                        `;
+
+                container.appendChild(taskElement);
+            });
+        }
+
+        // Selection Functions
+        function selectDepartment(departmentId, element) {
+            selectedDepartmentId = departmentId;
+
+            // Update UI
+            document.querySelectorAll('.department-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+
+            // Load personnel for selected department
+            loadPersonnelByDepartment(departmentId);
+        }
+
+        function selectCategory(categoryId, element) {
+            selectedCategoryId = categoryId;
+
+            // Update UI
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+
+            // Load tasks for selected category
+            loadTasksByCategory(categoryId);
+        }
+
+        // Order Form Submit Handler
+        // DÜZELTİLMİŞ
+        async function handleOrderSubmit(event) {
+            event.preventDefault();
+
+            try {
+                showLoading(true);
+
+                const orderData = {
+                    uretimNumarasi: document.getElementById('uretimNumarasi').value,
+                    musteri: parseInt(document.getElementById('customerSelect').value),
+                    istenilenBaslangicTarihi: document.getElementById('startDate').value,
+                    kategoriId: selectedCategoryId,
+                    kategoriSablonuKullan: document.getElementById('kategoriSablonuKullan').checked,
+                    oncelik: parseInt(document.getElementById('oncelik').value),
+                    sonTeslimTarihi: document.getElementById('endDate').value || null,
+                    notlar: document.getElementById('orderDescription').value || null,
+                    gorevler: Array.from(document.querySelectorAll('.task-checkbox:checked'))
+                        .map(checkbox => ({
+                            gorevId: parseInt(checkbox.value),
+                            ozelSure: null,
+                            ozelAciklama: null,
+                            oncuGorevIds: []
+                        }))
+                };
+
+                const response = await fetch(`${API_BASE_URL}/api/Siparis`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                showNotification('Sipariş başarıyla oluşturuldu', 'success');
+                document.getElementById('orderForm').reset();
+                clearSelections();
+                generateOrderNumber();
+                await loadOrders();
+
+            } catch (error) {
+                console.error('Error creating order:', error);
+                showNotification(`Sipariş oluşturulurken hata: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+
+        // Order Detail Functions
+        // DÜZELTİLMİŞ
+        async function viewOrderDetail(orderId) {
+            try {
+                showLoading(true);
+
+                const response = await fetch(`${API_BASE_URL}/api/Siparis/${orderId}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+
+                const order = await response.json();
+                selectedOrderId = orderId;
+                renderOrderDetail(order);
+
+                const detailTab = document.getElementById('detail-tab');
+                const tab = new bootstrap.Tab(detailTab);
+                tab.show();
+
+            } catch (error) {
+                console.error('Error loading order detail:', error);
+                showNotification('Sipariş detayı yüklenirken hata oluştu: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+
+        function renderOrderDetail(order) {
+            const container = document.getElementById('orderDetailContent');
+
+            container.innerHTML = `
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="card card-custom">
+                                    <div class="card-header">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0">
+                                                <i class="fas fa-clipboard-list me-2"></i>
+                                                Sipariş Detayı - ${order.uretimNumarasi}
+                                            </h5>
+                                            <div>
+                                                <button class="btn btn-primary btn-custom me-2" onclick="planOrder(${order.id})">
+                                                    <i class="fas fa-calendar-alt me-2"></i>Planla
+                                                </button>
+                                                <button class="btn btn-secondary btn-custom" onclick="refreshOrderDetail(${order.id})">
+                                                    <i class="fas fa-sync-alt me-2"></i>Yenile
+                                                </button>
+                                                <button class="btn btn-outline-secondary btn-custom" onclick="switchToOrdersTab()">
+                                                    <i class="fas fa-arrow-left me-2"></i>Geri
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <h6><i class="fas fa-info-circle me-2"></i>Genel Bilgiler</h6>
+                                                <table class="table table-borderless">
+                                                    <tr>
+                                                        <td><strong>Müşteri:</strong></td>
+                                                        <td><span class="badge bg-secondary">${MUSTERI_ENUM[order.musteri] || 'Bilinmiyor'}</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Kategori:</strong></td>
+                                                        <td>${order.kategoriAd || 'N/A'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Durum:</strong></td>
+                                                        <td><span class="status-badge status-${(order.durum || '').toLowerCase().replace(' ', '-')}">${order.durum || 'Bilinmiyor'}</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Öncelik:</strong></td>
+                                                        <td><span class="badge bg-info">${order.oncelik || 'N/A'}</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>İstenilen Başlangıç:</strong></td>
+                                                        <td>${order.istenilenBaslangicTarihi ? formatDateTime(order.istenilenBaslangicTarihi) : 'N/A'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Son Teslim:</strong></td>
+                                                        <td>${order.sonTeslimTarihi ? formatDateTime(order.sonTeslimTarihi) : 'N/A'}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6><i class="fas fa-sticky-note me-2"></i>Notlar</h6>
+                                                <p class="text-muted">${order.notlar || 'Not bulunmuyor'}</p>
+
+                                                <h6 class="mt-4"><i class="fas fa-clock me-2"></i>Zaman Bilgileri</h6>
+                                                <small class="text-muted">
+                                                    <strong>Oluşturulma:</strong> ${order.olusturulmaTarihi ? formatDateTime(order.olusturulmaTarihi) : 'N/A'}<br>
+                                                    <strong>Son Güncelleme:</strong> ${order.guncellemeTarihi ? formatDateTime(order.guncellemeTarihi) : 'N/A'}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card card-custom mt-3">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"><i class="fas fa-tasks me-2"></i>Görevler</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Görev</th>
+                                                        <th>Durum</th>
+                                                        <th>Süre</th>
+                                                        <th>Personel</th>
+                                                        <th>İşlemler</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${(order.uretimGorevleri || []).map(task => `
+                                                        <tr>
+                                                            <td><strong>${task.gorevAd || 'N/A'}</strong></td>
+                                                            <td><span class="status-badge status-${(GOREV_DURUM_ENUM[task.durum] || '').toLowerCase().replace(' ', '-')}">${GOREV_DURUM_ENUM[task.durum] || 'Bilinmiyor'}</span></td>
+                                                            <td>${task.sure || 0} dakika</td>
+                                                            <td>${task.atananPersonelAd || 'Atanmamış'}</td>
+                                                            <td>
+                                                                <button class="btn btn-sm btn-outline-primary btn-custom" onclick="updateTaskStatusModal(${task.id}, '${task.gorevAd}', ${task.durum})">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    `).join('')}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="card card-custom">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>İstatistikler</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row text-center">
+                                            <div class="col-6">
+                                                <div class="stat-card p-3 mb-3">
+                                                    <h4 class="mb-0">${(order.uretimGorevleri || []).length}</h4>
+                                                    <small class="opacity-75">Toplam Görev</small>
+                                                </div>
+                                            </div>
+                                                                                <div class="col-6">
+                                            <div class="stat-card-success p-3 mb-3">
+                                                <h4 class="mb-0">${(order.uretimGorevleri || []).filter(t => t.durum === 4).length}</h4>
+                                                <small class="opacity-75">Tamamlanan</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="stat-card-warning p-3 mb-3">
+                                                <h4 class="mb-0">${(order.uretimGorevleri || []).filter(t => t.durum === 3).length}</h4>
+                                                <small class="opacity-75">Devam Eden</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="stat-card-info p-3 mb-3">
+                                                <h4 class="mb-0">${order.oncelik || 0}</h4>
+                                                <small class="opacity-75">Öncelik</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card card-custom mt-3">
+                                <div class="card-header">
+                                    <h6 class="mb-0"><i class="fas fa-history me-2"></i>Sipariş Geçmişi</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="timeline-item">
+                                        <div class="d-flex justify-content-between">
+                                            <strong>Sipariş Oluşturuldu</strong>
+                                            <small class="text-muted">${order.olusturulmaTarihi ? formatDate(order.olusturulmaTarihi) : 'N/A'}</small>
+                                        </div>
+                                        <p class="text-muted mb-0">Sipariş sisteme kaydedildi</p>
+                                    </div>
+
+                                    ${(order.uretimGorevleri || []).filter(t => t.durum !== 1).map(task => `
+                                        <div class="timeline-item">
+                                            <div class="d-flex justify-content-between">
+                                                <strong>${task.gorevAd} - ${GOREV_DURUM_ENUM[task.durum]}</strong>
+                                                <small class="text-muted">${task.guncellemeTarihi ? formatDate(task.guncellemeTarihi) : 'Bugün'}</small>
+                                            </div>
+                                            <p class="text-muted mb-0">Görev durumu güncellendi</p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        }
+
+        // Task Status Update Functions
+        function updateTaskStatusModal(taskId, taskName, currentStatus) {
+            document.getElementById('taskName').value = taskName;
+            document.getElementById('newStatus').value = currentStatus;
+            document.getElementById('statusDescription').value = '';
+
+            // Store task ID for update
+            document.getElementById('updateTaskStatusBtn').setAttribute('data-task-id', taskId);
+
+            const modal = new bootstrap.Modal(document.getElementById('taskStatusModal'));
+            modal.show();
+        }
+
+        // DÜZELTİLMİŞ
+        async function updateTaskStatus() {
+            const taskId = document.getElementById('updateTaskStatusBtn').getAttribute('data-task-id');
+            const newStatus = document.getElementById('newStatus').value;
+            const description = document.getElementById('statusDescription').value;
+
+            try {
+                showLoading(true);
+
+                const requestData = {
+                    gorevId: parseInt(taskId),
+                    yeniDurum: parseInt(newStatus),
+                    aciklama: description || null
+                };
+
+                const response = await fetch(`${API_BASE_URL}/api/Gorev/${taskId}/durum`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                showNotification('Görev durumu başarıyla güncellendi', 'success');
+
+                const modal = bootstrap.Modal.getInstance(document.getElementById('taskStatusModal'));
+                modal.hide();
+
+                await loadOrders();
+                if (selectedOrderId) {
+                    await viewOrderDetail(selectedOrderId);
+                }
+
+            } catch (error) {
+                console.error('Error updating task status:', error);
+                showNotification(`Görev durumu güncellenirken hata: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+
+        // Planning Functions
+        // DÜZELTİLMİŞ
+        async function planOrder(orderId) {
+            try {
+                showLoading(true);
+
+                const planningData = {
+                    siparisId: orderId,
+                    tumSiparisleriPlanla: false
+                };
+
+                const response = await fetch(`${API_BASE_URL}/api/Planlama/planla`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(planningData)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                showNotification('Planlama başarıyla tamamlandı', 'success');
+
+                const planningTab = document.getElementById('planning-tab');
+                const tab = new bootstrap.Tab(planningTab);
+                tab.show();
+
+                await loadGanttData();
+
+            } catch (error) {
+                console.error('Error planning order:', error);
+                showNotification(`Planlama hatası: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+
+        async function planAllOrders() {
+            try {
+                showLoading(true);
+
+                const planningData = {
+                    siparisId: null,
+                    tumSiparisleriPlanla: true
+                };
+
+                const response = await fetch(`${API_BASE_URL}/api/Planlama/planla`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(planningData)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                showNotification('Tüm siparişler başarıyla planlandı', 'success');
+                await loadGanttData();
+
+            } catch (error) {
+                console.error('Error planning all orders:', error);
+                showNotification(`Planlama hatası: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Gantt Functions
+        // DÜZELTİLMİŞ
+        async function loadGanttData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/Planlama/gantt-data`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+
+                const ganttData = await response.json();
+                initializeGanttWithData(ganttData);
+
+            } catch (error) {
+                console.error('Error loading gantt data:', error);
+                initializeGantt(); // Fallback
+            }
+        }
+
+
+        function initializeGantt() {
+            if (typeof gantt !== 'undefined') {
+                gantt.config.date_format = "%Y-%m-%d %H:%i:%s";
+                gantt.config.scale_unit = "day";
+                gantt.config.date_scale = "%d %M";
+                gantt.config.min_column_width = 80;
+                gantt.config.scale_height = 54;
+
+                gantt.init("gantt_here");
+
+                // Basic mock data if no real data available
+                const mockGanttData = {
+                    data: currentOrders.slice(0, 5).map((order, index) => ({
+                        id: order.id,
+                        text: order.uretimNumarasi || `Sipariş ${order.id}`,
+                        start_date: order.istenilenBaslangicTarihi ? new Date(order.istenilenBaslangicTarihi).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                        duration: order.sonTeslimTarihi && order.istenilenBaslangicTarihi ?
+                            Math.ceil((new Date(order.sonTeslimTarihi) - new Date(order.istenilenBaslangicTarihi)) / (1000 * 60 * 60 * 24)) : 7,
+                        progress: 0,
+                        parent: 0
+                    }))
+                };
+
+                gantt.parse(mockGanttData);
+            }
+        }
+
+        function initializeGanttWithData(data) {
+            if (typeof gantt !== 'undefined') {
+                gantt.clearAll();
+                gantt.parse(data);
+            }
+        }
+
+        // Chart Initialization
+        function initializeCharts() {
+            // Status Chart
+            const statusCtx = document.getElementById('statusChart');
+            if (statusCtx && currentOrders.length > 0) {
+                const statusCounts = {
+                    'Beklemede': currentOrders.filter(o => o.durum === 'Beklemede').length,
+                    'Devam Ediyor': currentOrders.filter(o => o.durum === 'Devam Ediyor').length,
+                    'Tamamlandı': currentOrders.filter(o => o.durum === 'Tamamlandı').length,
+                    'İptal': currentOrders.filter(o => o.durum === 'İptal').length
+                };
+
+                new Chart(statusCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(statusCounts),
+                        datasets: [{
+                            data: Object.values(statusCounts),
+                            backgroundColor: ['#ffc107', '#28a745', '#17a2b8', '#dc3545']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Trend Chart
+            const trendCtx = document.getElementById('trendChart');
+            if (trendCtx) {
+                new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran'],
+                        datasets: [{
+                            label: 'Sipariş Sayısı',
+                            data: [12, 19, 15, 25, 22, currentOrders.length],
+                            borderColor: 'var(--primary-color)',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Performance Chart
+            const performanceCtx = document.getElementById('performanceChart');
+            if (performanceCtx) {
+                new Chart(performanceCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Ahmet Y.', 'Mehmet D.', 'Ayşe K.', 'Fatma S.'],
+                        datasets: [{
+                            label: 'Tamamlanan Görevler',
+                            data: [12, 8, 15, 10],
+                            backgroundColor: 'var(--primary-color)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Utility Functions
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('tr-TR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleString('tr-TR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function showLoading(show) {
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.style.display = show ? 'block' : 'none';
+        }
+
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            const alertClass = type === 'error' ? 'alert-danger' :
+                type === 'success' ? 'alert-success' : 'alert-info';
+
+            const notification = document.createElement('div');
+            notification.className = `alert ${alertClass} alert-dismissible fade show fade-in`;
+            notification.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+
+            container.appendChild(notification);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Statistics Update
+        function updateStatistics() {
+            const stats = {
+                toplam: currentOrders.length,
+                tamamlanan: currentOrders.filter(o => o.durum === 'Tamamlandı').length,
+                devamEden: currentOrders.filter(o => o.durum === 'Devam Ediyor').length,
+                beklemede: currentOrders.filter(o => o.durum === 'Beklemede').length
+            };
+
+            document.getElementById('totalOrders').textContent = stats.toplam;
+            document.getElementById('completedOrders').textContent = stats.tamamlanan;
+            document.getElementById('inProgressOrders').textContent = stats.devamEden;
+            document.getElementById('pendingOrders').textContent = stats.beklemede;
+        }
+
+        // Navigation Functions
+        function switchToOrdersTab() {
+            const ordersTab = document.getElementById('orders-tab');
+            const tab = new bootstrap.Tab(ordersTab);
+            tab.show();
+        }
+
+        function handleTabChange(event) {
+            const tabId = event.target.getAttribute('data-bs-target');
+
+            switch (tabId) {
+                case '#planning':
+                    loadGanttData();
+                    break;
+                case '#statistics':
+                    setTimeout(() => {
+                        initializeCharts();
+                    }, 100);
+                    break;
+            }
+        }
+
+        // Filter Functions
+        function filterOrders() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            filteredOrders = currentOrders.filter(order => {
+                return (order.uretimNumarasi || '').toLowerCase().includes(searchTerm) ||
+                    (MUSTERI_ENUM[order.musteri] || '').toLowerCase().includes(searchTerm) ||
+                    (order.kategoriAd || '').toLowerCase().includes(searchTerm) ||
+                    (order.durum || '').toLowerCase().includes(searchTerm) ||
+                    (order.notlar || '').toLowerCase().includes(searchTerm);
+            });
+
+            renderFilteredOrdersTable();
+        }
+
+        function renderFilteredOrdersTable() {
+            const tbody = document.getElementById('ordersTableBody');
+            tbody.innerHTML = '';
+
+            if (!filteredOrders || filteredOrders.length === 0) {
+                tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="fas fa-search fa-2x mb-2"></i><br>
+                                Arama kriterine uygun sipariş bulunamadı
+                            </td>
+                        </tr>
+                    `;
+                return;
+            }
+
+            filteredOrders.forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                        <td><strong>${order.uretimNumarasi || 'N/A'}</strong></td>
+                        <td><span class="badge bg-secondary">${MUSTERI_ENUM[order.musteri] || 'Bilinmiyor'}</span></td>
+                        <td>${order.kategoriAd || 'N/A'}</td>
+                        <td><span class="status-badge status-${(order.durum || '').toLowerCase().replace(' ', '-')}">${order.durum || 'Bilinmiyor'}</span></td>
+                        <td>${order.istenilenBaslangicTarihi ? formatDate(order.istenilenBaslangicTarihi) : 'N/A'}</td>
+                        <td>${order.sonTeslimTarihi ? formatDate(order.sonTeslimTarihi) : 'N/A'}</td>
+                        <td><span class="badge bg-info">${order.oncelik || 'N/A'}</span></td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary btn-custom" onclick="viewOrderDetail(${order.id})" title="Detay">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-success btn-custom" onclick="planOrder(${order.id})" title="Planla">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-custom" onclick="deleteOrder(${order.id})" title="İptal">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Delete Order Function
+        // DÜZELTİLMİŞ
+        async function deleteOrder(orderId) {
+            if (!confirm('Bu siparişi iptal etmek istediğinizden emin misiniz?')) {
+                return;
+            }
+
+            try {
+                showLoading(true);
+
+                const response = await fetch(`${API_BASE_URL}/api/Siparis/${orderId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                showNotification('Sipariş başarıyla iptal edildi', 'success');
+                await loadOrders();
+
+            } catch (error) {
+                console.error('Error deleting order:', error);
+                showNotification(`Sipariş iptal edilirken hata: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+
+        // Refresh Functions
+        async function refreshData() {
+            try {
+                showLoading(true);
+
+                await Promise.all([
+                    loadOrders(),
+                    loadDepartments(),
+                    loadCategories()
+                ]);
+
+                showNotification('Veriler başarıyla yenilendi', 'success');
+                updateLastUpdate();
+                updateApiStatus('success');
+
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+                showNotification('Veriler yenilenirken hata oluştu: ' + error.message, 'error');
+                updateApiStatus('error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function refreshOrderDetail(orderId) {
+            await viewOrderDetail(orderId);
+        }
+
+        // Clear Selections
+        function clearSelections() {
+            selectedDepartmentId = null;
+            selectedCategoryId = null;
+            selectedPersonnel = [];
+            selectedTasks = [];
+
+            // Clear UI selections
+            document.querySelectorAll('.department-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            // Reset personnel and task lists
+            document.getElementById('personnelList').innerHTML = `
+                    <div class="p-3 text-center text-muted">
+                        <i class="fas fa-users fa-2x mb-2"></i>
+                        <p class="mb-0">Departman seçin</p>
+                    </div>
+                `;
+
+            document.getElementById('taskList').innerHTML = `
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-tasks fa-2x mb-2"></i>
+                        <p class="mb-0">Kategori seçin</p>
+                    </div>
+                `;
+        }
+
+        // Generate Order Number
+        function generateOrderNumber() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const time = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
+
+            const orderNumber = `SP-${year}${month}${day}-${time}`;
+            document.getElementById('uretimNumarasi').value = orderNumber;
+        }
+
+        // Status Functions
+        function updateApiStatus(status) {
+            const statusElement = document.getElementById('apiStatus');
+            if (statusElement) {
+                if (status === 'success') {
+                    statusElement.className = 'badge bg-success';
+                    statusElement.textContent = 'Aktif';
+                } else {
+                    statusElement.className = 'badge bg-danger';
+                    statusElement.textContent = 'Hata';
+                }
+            }
+        }
+
+        function updateLastUpdate() {
+            const updateElement = document.getElementById('lastUpdate');
+            if (updateElement) {
+                const now = new Date();
+                updateElement.textContent = now.toLocaleTimeString('tr-TR');
+            }
+
+            const operationsElement = document.getElementById('totalOperations');
+            if (operationsElement) {
+                const currentCount = parseInt(operationsElement.textContent) || 0;
+                operationsElement.textContent = currentCount + 1;
+            }
+        }
+
+    </script>
+</body>
+</html>
+

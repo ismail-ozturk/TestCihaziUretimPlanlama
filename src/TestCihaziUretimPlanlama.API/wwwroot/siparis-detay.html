@@ -1,0 +1,750 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sipariş Detayı - Test Cihazı Üretim Planlama</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .siparis-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .siparis-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+        }
+
+        .siparis-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .siparis-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-icon {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin-right: 1rem;
+            width: 30px;
+        }
+
+        .info-content h6 {
+            margin: 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .info-content p {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .gorev-table {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: #667eea;
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .gorev-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+            .gorev-item:hover {
+                background: #f8f9fa;
+            }
+
+            .gorev-item:last-child {
+                border-bottom: none;
+            }
+
+        .gorev-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 120px;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .gorev-name {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .gorev-department {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .durum-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .progress-container {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .floating-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            z-index: 1050;
+            width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1040;
+            backdrop-filter: blur(3px);
+        }
+
+        .stats-row {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .timeline-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+            .timeline-item:last-child {
+                border-bottom: none;
+            }
+
+        .timeline-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: white;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-date {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-2">
+                            <li class="breadcrumb-item">
+                                <a href="siparis-yonetim.html" class="text-white-50">
+                                    <i class="fas fa-home me-1"></i>Ana Sayfa
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">
+                                Sipariş Detayı
+                            </li>
+                        </ol>
+                    </nav>
+                    <h1 class="h2 mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Sipariş Detayı
+                    </h1>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-light me-2" onclick="planSiparis()">
+                        <i class="fas fa-play me-1"></i> Planla
+                    </button>
+                    <button class="btn btn-outline-light me-2" onclick="refreshData()">
+                        <i class="fas fa-sync me-1"></i> Yenile
+                    </button>
+                    <button class="btn btn-outline-light" onclick="window.history.back()">
+                        <i class="fas fa-arrow-left me-1"></i> Geri
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <!-- Sipariş Bilgileri -->
+        <div class="siparis-card">
+            <div class="siparis-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="siparis-title" id="siparisNumarasi">-</div>
+                        <div class="siparis-subtitle" id="musteriAdi">-</div>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge bg-light text-dark fs-6 px-3 py-2" id="siparisDurum">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="info-grid" id="siparisInfo">
+                <!-- Sipariş bilgileri buraya yüklenecek -->
+            </div>
+        </div>
+
+        <!-- İstatistikler -->
+        <div class="stats-row">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="toplamGorev">0</div>
+                        <div class="stat-label">Toplam Görev</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="tamamlananGorev">0</div>
+                        <div class="stat-label">Tamamlanan</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="devamEdenGorev">0</div>
+                        <div class="stat-label">Devam Eden</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="tamamlanmaYuzdesi">0%</div>
+                        <div class="stat-label">Tamamlanma</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Görev Listesi -->
+            <div class="col-lg-8">
+                <div class="gorev-table">
+                    <div class="table-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-tasks me-2"></i>
+                            Görevler
+                        </h4>
+                    </div>
+                    <div id="gorevListesi">
+                        <!-- Görevler buraya yüklenecek -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="col-lg-4">
+                <div class="timeline-container">
+                    <h5 class="mb-3">
+                        <i class="fas fa-history me-2"></i>
+                        Sipariş Geçmişi
+                    </h5>
+                    <div id="siparisTimeline">
+                        <!-- Timeline buraya yüklenecek -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Görev Durum Güncelleme Modal -->
+    <div class="modal fade" id="gorevDurumModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit me-2"></i>
+                        Görev Durumu Güncelle
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="gorevDurumForm">
+                        <input type="hidden" id="guncellenecekGorevId">
+                        <div class="mb-3">
+                            <label class="form-label">Görev</label>
+                            <input type="text" class="form-control" id="gorevAdi" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Yeni Durum</label>
+                            <select class="form-select" id="yeniDurum" required>
+                                <option value="3">Başladı</option>
+                                <option value="4">Devam Ediyor</option>
+                                <option value="5">Tamamlandı</option>
+                                <option value="6">Bekletildi</option>
+                                <option value="7">İptal</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Açıklama (Opsiyonel)</label>
+                            <textarea class="form-control" id="durumAciklamasi" rows="3" placeholder="Durum değişikliği hakkında açıklama..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary" onclick="gorevDurumGuncelle()">
+                        <i class="fas fa-save me-1"></i> Güncelle
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://localhost:7228/api';
+        let siparisId = null;
+        let siparisData = null;
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', function() {
+            // URL'den sipariş ID'sini al
+            const urlParams = new URLSearchParams(window.location.search);
+            siparisId = urlParams.get('id');
+
+            if (siparisId) {
+                loadSiparisDetay();
+            } else {
+                alert('Sipariş ID bulunamadı!');
+                window.history.back();
+            }
+        });
+
+        // Sipariş detayını yükle
+        async function loadSiparisDetay() {
+            try {
+                const response = await fetch(`${API_BASE}/Siparis/${siparisId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    siparisData = data.data;
+                    renderSiparisDetay(siparisData);
+                    renderGorevler(siparisData.uretimGorevleri);
+                    renderStats(siparisData);
+                    renderTimeline(siparisData);
+                } else {
+                    alert('Sipariş detayı yüklenemedi: ' + data.message);
+                    window.history.back();
+                }
+            } catch (error) {
+                console.error('Sipariş detay yükleme hatası:', error);
+                alert('Bağlantı hatası oluştu!');
+            }
+        }
+
+        // Sipariş detayını render et
+        function renderSiparisDetay(siparis) {
+            document.getElementById('siparisNumarasi').textContent = siparis.uretimNumarasi;
+            document.getElementById('musteriAdi').textContent = siparis.musteriText;
+            document.getElementById('siparisDurum').textContent = siparis.durumText;
+
+            const infoContainer = document.getElementById('siparisInfo');
+            infoContainer.innerHTML = `
+                <div class="info-item">
+                    <i class="fas fa-calendar-alt info-icon"></i>
+                    <div class="info-content">
+                        <h6>İstenilen Başlangıç</h6>
+                        <p>${formatDate(siparis.istenilenBaslangicTarihi)}</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-calendar-check info-icon"></i>
+                    <div class="info-content">
+                        <h6>Son Teslim Tarihi</h6>
+                        <p>${formatDate(siparis.sonTeslimTarihi)}</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-layer-group info-icon"></i>
+                    <div class="info-content">
+                        <h6>Kategori</h6>
+                        <p>${siparis.kategoriAdi}</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-flag info-icon"></i>
+                    <div class="info-content">
+                        <h6>Öncelik</h6>
+                        <p>${siparis.oncelik}</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-user info-icon"></i>
+                    <div class="info-content">
+                        <h6>Müşteri</h6>
+                        <p>${siparis.musteriText}</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-sticky-note info-icon"></i>
+                    <div class="info-content">
+                        <h6>Notlar</h6>
+                        <p>${siparis.notlar || 'Yok'}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Görevleri render et
+        function renderGorevler(gorevler) {
+            const container = document.getElementById('gorevListesi');
+
+            if (!gorevler || gorevler.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-4">
+                        <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                        <h5>Henüz görev oluşturulmamış</h5>
+                        <p class="text-muted">Bu sipariş için henüz görev tanımlanmamış.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+
+            gorevler.forEach(gorev => {
+                const gorevDiv = document.createElement('div');
+                gorevDiv.className = 'gorev-item';
+
+                const progress = calculateGorevProgress(gorev);
+                const durumBadge = getDurumBadge(gorev.durum);
+
+                gorevDiv.innerHTML = `
+                    <div class="gorev-row">
+                        <div>
+                            <div class="gorev-name">${gorev.gorevAdi}</div>
+                            <div class="gorev-department">
+                                <i class="fas fa-building me-1"></i>${gorev.departmanAdi}
+                                ${gorev.atananPersonelAdi ? `<i class="fas fa-user ms-2 me-1"></i>${gorev.atananPersonelAdi}` : ''}
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <strong>${gorev.sure}h</strong>
+                            <div class="small text-muted">Süre</div>
+                        </div>
+                        <div>
+                            <div class="small text-muted">Planlanan</div>
+                            <div>${gorev.planlananBaslangic ? formatDateTime(gorev.planlananBaslangic) : '-'}</div>
+                        </div>
+                        <div>
+                            <div class="small text-muted">İlerleme</div>
+                            <div class="progress-container mt-1">
+                                <div class="progress-bar" style="width: ${progress}%"></div>
+                            </div>
+                            <div class="small text-center mt-1">${progress}%</div>
+                        </div>
+                        <div class="text-center">
+                            ${durumBadge}
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-outline-primary" onclick="showGorevDurumModal(${gorev.id}, '${gorev.gorevAdi}')" title="Durum Güncelle">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" onclick="showGorevDetay(${gorev.id})" title="Detay">
+                                <i class="fas fa-info"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(gorevDiv);
+            });
+        }
+
+        // İstatistikleri render et
+        function renderStats(siparis) {
+            const gorevler = siparis.uretimGorevleri || [];
+            const tamamlanan = gorevler.filter(g => g.durum === 5).length;
+            const devamEden = gorevler.filter(g => g.durum === 3 || g.durum === 4).length;
+            const yuzde = gorevler.length > 0 ? Math.round((tamamlanan / gorevler.length) * 100) : 0;
+
+            document.getElementById('toplamGorev').textContent = gorevler.length;
+            document.getElementById('tamamlananGorev').textContent = tamamlanan;
+            document.getElementById('devamEdenGorev').textContent = devamEden;
+            document.getElementById('tamamlanmaYuzdesi').textContent = yuzde + '%';
+        }
+
+        // Timeline render et
+        function renderTimeline(siparis) {
+            const container = document.getElementById('siparisTimeline');
+
+            const timelineItems = [
+                {
+                    icon: 'fas fa-plus',
+                    color: '#28a745',
+                    title: 'Sipariş Oluşturuldu',
+                    date: siparis.createdDate
+                },
+                {
+                    icon: 'fas fa-play',
+                    color: '#007bff',
+                    title: 'Planlama Başladı',
+                    date: siparis.planlananBaslangic
+                },
+                {
+                    icon: 'fas fa-clock',
+                    color: '#ffc107',
+                    title: 'Son Teslim Tarihi',
+                    date: siparis.sonTeslimTarihi
+                }
+            ];
+
+            container.innerHTML = '';
+
+            timelineItems.forEach(item => {
+                if (item.date) {
+                    const timelineDiv = document.createElement('div');
+                    timelineDiv.className = 'timeline-item';
+                    timelineDiv.innerHTML = `
+                        <div class="timeline-icon" style="background-color: ${item.color}">
+                            <i class="${item.icon}"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">${item.title}</div>
+                            <div class="timeline-date">${formatDateTime(item.date)}</div>
+                        </div>
+                    `;
+                    container.appendChild(timelineDiv);
+                }
+            });
+        }
+
+        // Görev durumu güncelle modal
+        function showGorevDurumModal(gorevId, gorevAdi) {
+            document.getElementById('guncellenecekGorevId').value = gorevId;
+            document.getElementById('gorevAdi').value = gorevAdi;
+            new bootstrap.Modal(document.getElementById('gorevDurumModal')).show();
+        }
+
+        // Görev durumu güncelle
+        async function gorevDurumGuncelle() {
+            try {
+                const gorevId = parseInt(document.getElementById('guncellenecekGorevId').value);
+                const formData = {
+                    gorevId: gorevId,
+                    yeniDurum: parseInt(document.getElementById('yeniDurum').value),
+                    aciklama: document.getElementById('durumAciklamasi').value
+                };
+
+                const response = await fetch(`${API_BASE}/Gorev/${gorevId}/durum`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Görev durumu güncellendi!');
+                    bootstrap.Modal.getInstance(document.getElementById('gorevDurumModal')).hide();
+                    loadSiparisDetay(); // Sayfayı yenile
+                } else {
+                    alert('Hata: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Görev durum güncelleme hatası:', error);
+                alert('Görev durumu güncellenirken hata oluştu: ' + error.message);
+            }
+        }
+
+        // Sipariş planla
+        async function planSiparis() {
+            try {
+                const requestData = {
+                    siparisId: parseInt(siparisId),
+                    tumSiparisleriPlanla: false
+                };
+
+                const response = await fetch(`${API_BASE}/Planlama/planla`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Sipariş başarıyla planlandı!');
+                    loadSiparisDetay();
+                } else {
+                    alert('Hata: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Planlama hatası:', error);
+                alert('Planlama sırasında hata oluştu: ' + error.message);
+            }
+        }
+
+        // Yardımcı fonksiyonlar
+        function calculateGorevProgress(gorev) {
+            if (gorev.durum === 5) return 100; // Tamamlandı
+            if (gorev.durum === 3 || gorev.durum === 4) return 50; // Başladı/Devam ediyor
+            return 0; // Diğer durumlar
+        }
+
+        function getDurumBadge(durum) {
+            const durumMap = {
+                1: { text: 'Beklemede', class: 'bg-secondary' },
+                2: { text: 'Planli', class: 'bg-primary' },
+                3: { text: 'Başladı', class: 'bg-warning text-dark' },
+                4: { text: 'Devam Ediyor', class: 'bg-info text-dark' },
+                5: { text: 'Tamamlandı', class: 'bg-success' },
+                6: { text: 'Bekletildi', class: 'bg-danger' },
+                7: { text: 'İptal', class: 'bg-dark' }
+            };
+
+            const durumInfo = durumMap[durum] || { text: 'Bilinmiyor', class: 'bg-secondary' };
+            return `<span class="durum-badge ${durumInfo.class}">${durumInfo.text}</span>`;
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('tr-TR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function formatDateTime(dateString) {
+            return new Date(dateString).toLocaleDateString('tr-TR', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function refreshData() {
+            loadSiparisDetay();
+        }
+
+        function showGorevDetay(gorevId) {
+            // Görev detay modal'ı veya sayfası açılabilir
+            alert('Görev detay özelliği yakında eklenecek!');
+        }
+    </script>
+</body>
+</html>

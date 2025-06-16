@@ -1,0 +1,568 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cihazı Üretim Planlama - Gantt Chart</title>
+
+    <!-- DHTMLX Gantt -->
+    <script src="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script>
+    <link href="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .filters {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .gantt-container {
+            height: calc(100vh - 200px);
+            position: relative;
+        }
+
+        #gantt_here {
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-group {
+            margin-bottom: 1rem;
+        }
+
+            .filter-group:last-child {
+                margin-bottom: 0;
+            }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+
+        .stats {
+            background: white;
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="container-fluid">
+            <h1 class="h3 mb-0">
+                Test Cihazı Üretim Planlama
+            </h1>
+            <p class="mb-0">Gantt Chart - Üretim Takip Sistemi</p>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalOrders">0</div>
+                        <div class="text-muted">Toplam Sipariş</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalTasks">0</div>
+                        <div class="text-muted">Toplam Görev</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-number" id="completedTasks">0</div>
+                        <div class="text-muted">Tamamlanan</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-number" id="activeTasks">0</div>
+                        <div class="text-muted">Devam Eden</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+        <div class="container-fluid">
+            <form id="filterForm">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="filter-group">
+                            <label class="form-label">Tarih Aralığı</label>
+                            <div class="row">
+                                <div class="col-6">
+                                    <input type="date" class="form-control form-control-sm" id="startDate">
+                                </div>
+                                <div class="col-6">
+                                    <input type="date" class="form-control form-control-sm" id="endDate">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="filter-group">
+                            <label class="form-label">Sipariş No</label>
+                            <select class="form-select form-select-sm" id="siparisFilter">
+                                <option value="">Tümü</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="filter-group">
+                            <label class="form-label">Departman</label>
+                            <select class="form-select form-select-sm" id="departmanFilter">
+                                <option value="">Tümü</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="filter-group">
+                            <label class="form-label">Personel</label>
+                            <select class="form-select form-select-sm" id="personelFilter">
+                                <option value="">Tümü</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="filter-group">
+                            <label class="form-label">Durum</label>
+                            <select class="form-select form-select-sm" id="durumFilter">
+                                <option value="">Tümü</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <div class="filter-group">
+                            <label class="form-label">&nbsp;</label>
+                            <div>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="applyFilters()">
+                                    Filtrele
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #e74c3c;"></div>
+                    <span>PMD</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #f39c12;"></div>
+                    <span>CNC</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #9b59b6;"></div>
+                    <span>Teknik</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #27ae60;"></div>
+                    <span>Türkiye</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #3498db;"></div>
+                    <span>Almanya</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gantt Chart -->
+    <div class="gantt-container">
+        <div class="loading" id="loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Yükleniyor...</span>
+            </div>
+        </div>
+        <div id="gantt_here"></div>
+    </div>
+
+    <script>
+        // API Base URL
+        const API_BASE = 'https://localhost:7228/api';
+
+        // Gantt Configuration
+        gantt.config.date_format = "%Y-%m-%d %H:%i:%s";
+        gantt.config.scales = [
+            { unit: "day", step: 1, format: "%d %M %Y" },
+            { unit: "hour", step: 12, format: "%H:%i" }
+        ];
+        // Süre hesaplama modu - hour olarak ayarla
+        // Süre hesaplama modu
+        gantt.config.duration_unit = "hour";
+        gantt.config.work_time = true;
+        gantt.config.correct_work_time = true;
+
+        // Çalışma saatleri tanımla
+        gantt.setWorkTime({ hours: [0, 24] });
+
+        // Link türlerini doğru tanımla
+        gantt.config.auto_types = true;
+        gantt.config.type_renderers = gantt.config.type_renderers || {};
+
+        // Link türlerini açıkça tanımla
+        gantt.config.links = {
+            "finish_to_start": "0",
+            "start_to_start": "1",
+            "finish_to_finish": "2",
+            "start_to_finish": "3"
+        };
+
+        // Link validation'ı özelleştir
+        gantt.attachEvent("onLinkValidation", function (link) {
+            // Tüm link'leri geçerli kabul et
+            return true;
+        });
+
+        // Error handling'i özelleştir
+        gantt.attachEvent("onError", function (error_message) {
+            console.log("Gantt Error:", error_message);
+            // Toast'ı gösterme
+            return false;
+        });
+
+        gantt.config.columns = [
+            { name: "text", label: "Görev", width: 200, tree: true },
+            { name: "start_date", label: "Başlangıç", width: 100, align: "center" },
+            {
+                name: "duration", label: "Süre (Saat)", width: 80, align: "center", template: function (task) {
+                    return (task.sure || task.duration || 0) + "h";
+                }
+            },
+            {
+                name: "departman", label: "Departman", width: 80, align: "center", template: function (task) {
+                    return task.departmanAdi || '';
+                }
+            },
+            {
+                name: "personel", label: "Personel", width: 120, align: "center", template: function (task) {
+                    return task.personelAdi || '';
+                }
+            },
+            {
+                name: "progress", label: "İlerleme", width: 60, align: "center", template: function (task) {
+                    return Math.round((task.progress || 0) * 100) + "%";
+                }
+            }
+        ];
+
+        gantt.config.tooltip_timeout = 0;
+        gantt.templates.tooltip_text = function (start, end, task) {
+            if (task.type === 'project') {
+                return `<b>${task.text}</b><br/>
+                    Müşteri: ${task.musteri || ''}<br/>
+                    Öncelik: ${task.oncelik || ''}<br/>
+                    Başlangıç: ${gantt.templates.tooltip_date_format(start)}<br/>
+                    Bitiş: ${gantt.templates.tooltip_date_format(end)}<br/>
+                    İlerleme: ${Math.round((task.progress || 0) * 100)}%`;
+            } else {
+                return `<b>${task.gorevAdi || task.text}</b><br/>
+                    Sipariş: ${task.siparisNo || ''}<br/>
+                    Departman: ${task.departmanAdi || ''}<br/>
+                    Personel: ${task.personelAdi || ''}<br/>
+                    Durum: ${task.durum || ''}<br/>
+                    Süre: ${task.sure || task.duration || 0} saat<br/>
+                    Başlangıç: ${gantt.templates.tooltip_date_format(start)}<br/>
+                    Bitiş: ${gantt.templates.tooltip_date_format(end)}`;
+            }
+        };
+        gantt.attachEvent("onTaskLoading", function (task) {
+            if (task.sure) {
+                // Backend'den gelen süreyi duration olarak ayarla
+                task.duration = task.sure;
+            }
+            return true;
+        });
+
+        // Görev kaydırma event'i - API'ye gönderim
+        gantt.attachEvent("onAfterTaskDrag", function (id, mode, e) {
+            var task = gantt.getTask(id);
+
+            // Sadece gerçek görevleri işle (project değil)
+            if (task.type !== 'project') {
+                console.log("Görev kaydırıldı:", task.text, "Yeni başlangıç:", task.start_date);
+
+                // API'ye gönder
+                updateTaskDateOnServer(id, task.start_date);
+            }
+
+            return true;
+        });
+
+        // API'ye görev zamanını güncelleme fonksiyonu
+        async function updateTaskDateOnServer(taskId, newStartDate) {
+            try {
+                // Loading göster
+                const loading = document.getElementById('loading');
+                if (loading) loading.style.display = 'block';
+
+                const requestData = {
+                    uretimGoreviId: parseInt(taskId.replace('task_', '')), // task_79 -> 79
+                    yeniBaslangicZamani: newStartDate.toISOString()
+                };
+
+                console.log("API'ye gönderilen veri:", requestData);
+
+                const response = await fetch(`${API_BASE}/Planlama/gorev-zamani`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    console.log("Görev zamanı başarıyla güncellendi");
+                    // Gantt'ı yeniden yükle
+                    await loadGanttData();
+                } else {
+                    console.error("Görev zamanı güncellenemedi:", result.message);
+                    alert("Görev zamanı güncellenemedi: " + result.message);
+                    // Hata durumunda Gantt'ı yeniden yükle (eski haline döndür)
+                    await loadGanttData();
+                }
+            } catch (error) {
+                console.error("API hatası:", error);
+                alert("Görev zamanı güncellenirken hata oluştu: " + error.message);
+                // Hata durumunda Gantt'ı yeniden yükle
+                await loadGanttData();
+            } finally {
+                // Loading gizle
+                const loading = document.getElementById('loading');
+                if (loading) loading.style.display = 'none';
+            }
+        }
+
+        gantt.init("gantt_here");
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeDates();
+            loadFilters();
+            loadGanttData();
+        });
+
+        function initializeDates() {
+            const today = new Date();
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const yearLater = new Date(today.getTime() + 12*30 * 24 * 60 * 60 * 1000);
+
+            document.getElementById('startDate').value = weekAgo.toISOString().split('T')[0];
+            document.getElementById('endDate').value = yearLater.toISOString().split('T')[0];
+        }
+
+        async function loadFilters() {
+            try {
+                const response = await fetch(`${API_BASE}/Planlama/gantt-data`);
+                const data = await response.json();
+
+                if (data.success && data.data.filters) {
+                    populateFilter('siparisFilter', data.data.filters.siparisler);
+                    populateFilter('departmanFilter', data.data.filters.departmanlar);
+                    populateFilter('personelFilter', data.data.filters.personeller);
+                    populateFilter('durumFilter', data.data.filters.durumlar);
+                }
+            } catch (error) {
+                console.error('Filter yükleme hatası:', error);
+            }
+        }
+
+        function populateFilter(selectId, options) {
+            const select = document.getElementById(selectId);
+            select.innerHTML = '<option value="">Tümü</option>';
+
+            if (options && Array.isArray(options)) {
+                options.forEach(option => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option.value;
+                    optionElement.textContent = option.text;
+                    select.appendChild(optionElement);
+                });
+            }
+        }
+
+        async function loadGanttData() {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+
+            try {
+                const params = new URLSearchParams();
+                params.append('baslangic', document.getElementById('startDate').value + 'T00:00:00');
+                params.append('bitis', document.getElementById('endDate').value + 'T23:59:59');
+
+                const siparisNo = document.getElementById('siparisFilter').value;
+                const departman = document.getElementById('departmanFilter').value;
+                const personel = document.getElementById('personelFilter').value;
+
+                if (siparisNo) params.append('siparisNo', siparisNo);
+                if (departman) params.append('departman', departman);
+                if (personel) params.append('personel', personel);
+
+                const response = await fetch(`${API_BASE}/Planlama/gantt-data?${params}`);
+                const data = await response.json();
+
+                if (data.success && data.data) {
+                    // Task'ları işle
+                    const processedTasks = data.data.tasks.map(task => {
+                        const realDuration = task.sure || task.duration || 0;
+                        return {
+                            id: task.id,
+                            text: task.text,
+                            start_date: new Date(task.startDate),
+                            end_date: new Date(task.endDate),
+                            duration: realDuration, // Backend'den gelen gerçek süre
+                            progress: task.progress || 0,
+                            parent: task.parent || 0,
+                            type: task.type || 'task',
+                            color: task.color || '#95a5a6',
+                            siparisNo: task.siparisNo,
+                            departmanAdi: task.departmanAdi,
+                            personelAdi: task.personelAdi,
+                            gorevAdi: task.gorevAdi,
+                            durum: task.durum,
+                            sure: realDuration, // Gerçek süreyi sakla
+                            musteri: task.musteri,
+                            oncelik: task.oncelik
+                        };
+                    });
+
+
+                    // Link'leri işle - Validation ekle
+                    const processedLinks = (data.data.links || []).filter(link => {
+                        // Source ve target'ın var olduğunu kontrol et
+                        const sourceExists = processedTasks.some(task => task.id === link.source);
+                        const targetExists = processedTasks.some(task => task.id === link.target);
+                        return sourceExists && targetExists;
+                    }).map(link => ({
+                        id: link.id,
+                        source: link.source,
+                        target: link.target,
+                        type: "0" // finish_to_start için numeric string
+                    }));
+
+                    console.log('Valid Links:', processedLinks);
+
+                    gantt.clearAll();
+
+                    // Önce task'ları yükle
+                    gantt.parse({
+                        data: processedTasks,
+                        links: [] // Önce boş link array
+                    });
+
+                    // Sonra link'leri ekle
+                    setTimeout(() => {
+                        processedLinks.forEach(link => {
+                            try {
+                                gantt.addLink(link);
+                            } catch (error) {
+                                console.warn('Link eklenirken hata:', link, error);
+                            }
+                        });
+                    }, 100);
+
+                    updateStats(processedTasks);
+                } else {
+                    console.error('API Error:', data.message);
+                    alert('Veri yükleme hatası: ' + (data.message || 'Bilinmeyen hata'));
+                }
+            } catch (error) {
+                console.error('Gantt veri yükleme hatası:', error);
+                alert('Veri yükleme hatası: ' + error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function updateStats(tasks) {
+            const orders = tasks.filter(t => t.type === 'project');
+            const taskItems = tasks.filter(t => t.type === 'task');
+            const completed = taskItems.filter(t => t.progress === 1);
+            const active = taskItems.filter(t => t.progress > 0 && t.progress < 1);
+
+            document.getElementById('totalOrders').textContent = orders.length;
+            document.getElementById('totalTasks').textContent = taskItems.length;
+            document.getElementById('completedTasks').textContent = completed.length;
+            document.getElementById('activeTasks').textContent = active.length;
+        }
+
+        function applyFilters() {
+            loadGanttData();
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('siparisFilter').focus();
+            }
+            if (e.key === 'F5') {
+                e.preventDefault();
+                loadGanttData();
+            }
+        });
+    </script>
+</body>
+</html>

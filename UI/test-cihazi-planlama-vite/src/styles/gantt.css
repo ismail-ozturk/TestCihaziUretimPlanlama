@@ -1,0 +1,225 @@
+/* src/styles/layout.css - Gantt için özel stiller ekleyin */
+
+/* Gantt sayfası için özel container */
+.gantt-page-container {
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important; /* ← Sayfa scroll'unu devre dışı bırakır */
+  background: #f0f2f5 !important;
+}
+
+/* Gantt container tam genişlik */
+.gantt-container-fullpage {
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background: #fff;
+  position: relative;
+  width: 100% !important;
+  height: 100% !important;
+}
+body.gantt-page {
+  overflow: hidden !important; /* ← Body scroll'unu devre dışı bırakır */
+  height: 100vh !important;
+}
+
+html.gantt-page {
+  overflow: hidden !important; /* ← HTML scroll'unu devre dışı bırakır */
+  height: 100vh !important;
+}
+/* DHTMLX Gantt özel stilleri */
+.gantt_layout_root {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.gantt_layout_content {
+  overflow: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.gantt_task_scale {
+  overflow-x: auto !important;
+}
+
+.gantt_data_area {
+  overflow: auto !important;
+}
+
+.gantt_grid {
+  width: 850px !important; /* Sabit grid genişliği */
+}
+
+.gantt_task {
+  width: auto !important;
+}
+
+/* Horizontal scroll bar stilleri */
+.gantt_layout_content::-webkit-scrollbar {
+  height: 12px;
+  width: 12px;
+}
+
+.gantt_layout_content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+.gantt_layout_content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 6px;
+}
+
+.gantt_layout_content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Scale özelleştirmeleri */
+.workday {
+  background-color: #fafafa !important;
+  font-weight: 600;
+}
+
+.weekend-day {
+  background-color: #fff2e8 !important;
+  color: #fa8c16;
+  font-weight: 600;
+}
+
+.today {
+  background-color: #e6f7ff !important;
+  color: #1890ff;
+  font-weight: 600;
+  border-left: 3px solid #1890ff;
+}
+
+/* Vardiya zamanları */
+.morning-shift {
+  background-color: #f6ffed !important;
+  color: #52c41a;
+  font-weight: 600;
+  border-left: 3px solid #52c41a;
+}
+
+.afternoon-shift {
+  background-color: #fff7e6 !important;
+  color: #fa8c16;
+  font-weight: 600;
+  border-left: 3px solid #fa8c16;
+}
+
+.evening-shift {
+  background-color: #f9f0ff !important;
+  color: #722ed1;
+  font-weight: 600;
+  border-left: 3px solid #722ed1;
+}
+
+.hour-scale {
+  background-color: #f8f9fa;
+  font-size: 11px;
+}
+
+/* Çalışma saatleri dışı */
+.non-working-time {
+  background-color: #f5f5f5 !important;
+  opacity: 0.6;
+}
+
+/* Proje görevleri için stil */
+.project-task .gantt_task_line {
+  background: linear-gradient(90deg, #3498db, #2980b9) !important;
+  border: 2px solid #2980b9 !important;
+  border-radius: 6px !important;
+  height: 28px !important;
+}
+
+/* Departman bazlı renkler */
+.pmd-task .gantt_task_line {
+  background-color: #e74c3c !important;
+  border-color: #c0392b !important;
+}
+
+.cnc-task .gantt_task_line {
+  background-color: #f39c12 !important;
+  border-color: #e67e22 !important;
+}
+
+.teknik-task .gantt_task_line {
+  background-color: #9b59b6 !important;
+  border-color: #8e44ad !important;
+}
+
+/* Grid stilleri */
+.gantt_grid_scale .gantt_grid_head_cell {
+  background-color: #fafafa;
+  border-color: #d9d9d9;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.gantt_grid_data .gantt_row {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.gantt_grid_data .gantt_row:hover {
+  background-color: #f5f5f5;
+}
+
+/* Task stilleri */
+.gantt_task .gantt_task_line {
+  border-radius: 4px;
+  border-width: 1px;
+}
+
+.gantt_task_progress {
+  border-radius: 3px;
+}
+
+/* Tooltip stilleri */
+.gantt_tooltip {
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  font-size: 13px;
+  max-width: 350px;
+  z-index: 1000;
+}
+
+/* Responsive tasarım */
+@media (max-width: 1200px) {
+  .gantt_grid {
+    width: 650px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .gantt_grid {
+    width: 450px !important;
+  }
+  
+  .hour-scale {
+    font-size: 10px;
+  }
+}
+
+/* Tam ekran modu */
+.gantt-container-fullpage:-webkit-full-screen {
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+.gantt-container-fullpage:-moz-full-screen {
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+.gantt-container-fullpage:fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+}
