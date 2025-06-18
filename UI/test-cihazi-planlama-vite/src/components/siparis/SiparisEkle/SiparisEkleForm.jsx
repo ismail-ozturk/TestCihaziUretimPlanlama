@@ -33,7 +33,7 @@ const SiparisEkleForm = () => {
   const [selectedKategori, setSelectedKategori] = useState(null);
   const [sablonKullan, setSablonKullan] = useState(true);
   const [gorevler, setGorevler] = useState([]);
-  const [bagimliliklar, setBagimliliklar] = useState([]); // Bağımlılık state'i eklendi
+  const [bagimliliklar, setBagimliliklar] = useState([]);
   const [zorunluPersoneller, setZorunluPersoneller] = useState({});
 
   // Hooks
@@ -41,67 +41,84 @@ const SiparisEkleForm = () => {
   const { data: kategoriSablon, isLoading: sablonLoading } = useKategoriSablon(selectedKategori);
   const siparisOlustur = useSiparisOlustur();
   const siparisPlanlama = useTekSiparisPlanlama();
-
-  // Kategori seçildiğinde şablon görevlerini yükle
-  useEffect(() => {
-    if (selectedKategori && kategoriSablon && kategoriSablon.gorevler) {
-      // Kategori seçildiğinde DAIMA şablon görevlerini yükle
-      const sablonGorevleri = kategoriSablon.gorevler.map(sablon => ({
-        id: sablon.id,
-        gorevId: sablon.gorevId,
-        gorevAdi: sablon.gorevAdi,
-        aciklama: sablon.gorevAciklama,
-        departmanAdi: sablon.departmanAdi,
-        sure: sablon.ozelSure || sablon.varsayilanSure,
-        sira: sablon.sira,
-        durum: 'Beklemede',
-        bagimliliklar: [],
-        sablondan: true // Şablondan geldiğini işaretle
-      }));
-
-      setGorevler(sablonGorevleri);
+useEffect(() => {
+  console.log('=== BACKEND VERİ KONTROLÜ ===');
+  console.log('kategoriSablon:', kategoriSablon);
+  console.log('gorevSablonlari var mı?', !!kategoriSablon?.gorevSablonlari);
+  console.log('gorevSablonlari uzunluğu:', kategoriSablon?.gorevSablonlari?.length);
+  console.log('bagimliliklar var mı?', !!kategoriSablon?.bagimliliklar);
+  console.log('bagimliliklar uzunluğu:', kategoriSablon?.bagimliliklar?.length);
+}, [kategoriSablon]);
+  // Kategori seçildiğinde şablon görevlerini yükle - ID MAPPING İLE
+ useEffect(() => {
+  if (selectedKategori && kategoriSablon && kategoriSablon.gorevler) { // gorevler kullan!
+    console.log('Kategori şablonu yüklendi:', kategoriSablon);
+    
+    // Görevleri benzersiz ID ile set et
+    const sablonGorevleri = kategoriSablon.gorevler.map(sablon => ({
+      id: `gorev_${sablon.id}_${Date.now()}`, // Benzersiz ID oluştur
+      originalSablonId: sablon.id, // Orijinal şablon ID'sini sakla
+      gorevId: sablon.gorevId,
+      tempId: `temp_${sablon.id}_${Date.now()}`,
+      sira: sablon.sira,
+      gorevAdi: sablon.gorevAdi,
+      departmanAdi: sablon.departmanAdi,
+      sure: sablon.ozelSure || sablon.varsayilanSure,
+      aciklama: sablon.gorevAciklama,
+      sablondan: true
+    }));
+    setGorevler(sablonGorevleri);
+    
+    // Bağımlılıkları ID mapping ile set et
+    if (kategoriSablon.bagimliliklar && kategoriSablon.bagimliliklar.length > 0) {
+      const sablonBagimliliklar = kategoriSablon.bagimliliklar.map(bagimlilik => {
+        // Şablon ID'lerini görev ID'lerine maple
+        const oncuGorev = sablonGorevleri.find(g => g.originalSablonId === bagimlilik.oncuKategoriGorevSablonuId);
+        const ardilGorev = sablonGorevleri.find(g => g.originalSablonId === bagimlilik.ardilKategoriGorevSablonuId);
+        
+        return {
+          id: `bagimlilik_${bagimlilik.id}_${Date.now()}`, // Benzersiz bağımlılık ID
+          originalBagimlilikId: bagimlilik.id, // Orijinal bağımlılık ID
+          oncuUretimGoreviId: oncuGorev?.id, // Yeni görev ID'si
+          ardilUretimGoreviId: ardilGorev?.id, // Yeni görev ID'si
+          oncuKategoriGorevSablonuId: bagimlilik.oncuKategoriGorevSablonuId,
+          ardilKategoriGorevSablonuId: bagimlilik.ardilKategoriGorevSablonuId,
+          bagimlilikTipi: bagimlilik.bagimlilikTipiText || 'FinishToStart',
+          bagimlilikTipiNumeric: bagimlilik.bagimlilikTipi,
+          gecikmeGunu: bagimlilik.gecikmeGunu || 0,
+          oncuGorevAdi: bagimlilik.oncuGorevAdi,
+          ardilGorevAdi: bagimlilik.ardilGorevAdi,
+          oncuGorevSira: bagimlilik.oncuGorevSira,
+          ardilGorevSira: bagimlilik.ardilGorevSira
+        };
+      }).filter(b => b.oncuUretimGoreviId && b.ardilUretimGoreviId);
       
-      // Bağımlılıkları da yükle
-      if (kategoriSablon.bagimliliklar) {
-        const sablonBagimliliklar = kategoriSablon.bagimliliklar.map(bagimlilik => ({
-          ...bagimlilik,
-          id: `temp_${Date.now()}_${Math.random()}`
-        }));
-        setBagimliliklar(sablonBagimliliklar);
-      }
-      
-      message.success(`${sablonGorevleri.length} görev şablondan yüklendi`);
-    } else if (!selectedKategori) {
-      // Kategori seçimi kaldırıldığında görevleri temizle
-      setGorevler([]);
-      setBagimliliklar([]);
+      setBagimliliklar(sablonBagimliliklar);
+      console.log('ID mapping ile bağımlılıklar yüklendi:', sablonBagimliliklar);
     }
-  }, [selectedKategori, kategoriSablon]);
+    
+    message.success(`${sablonGorevleri.length} görev ve ${kategoriSablon.bagimliliklar?.length || 0} bağımlılık yüklendi`);
+  } else if (!selectedKategori) {
+    setGorevler([]);
+    setBagimliliklar([]);
+  }
+}, [selectedKategori, kategoriSablon]);
 
   const handleKategoriChange = (kategoriId) => {
     setSelectedKategori(kategoriId);
-    // Toggle'ı varsayılan olarak açık yap
     setSablonKullan(true);
   };
 
   const handleSablonKullanChange = (checked) => {
     setSablonKullan(checked);
-    // Toggle değişikliğinde görevleri ASLA temizleme
-    // Sadece UI'da düzenleme imkanını aç/kapat
   };
 
   const handleGorevlerChange = (yeniGorevler) => {
     setGorevler([...yeniGorevler]);
   };
 
-  // Bağımlılık yönetimi fonksiyonları
-  const handleBagimlilikEkle = (oncuGorevSira, ardilGorevSira, bagimlilikTipi) => {
-    const yeniBagimlilik = {
-      id: `temp_${Date.now()}_${Math.random()}`,
-      oncuGorevSira,
-      ardilGorevSira,
-      bagimlilikTipi
-    };
+  // Bağımlılık yönetimi fonksiyonları - ID tabanlı
+  const handleBagimlilikEkle = (yeniBagimlilik) => {
     setBagimliliklar(prev => [...prev, yeniBagimlilik]);
     message.success('Bağımlılık eklendi');
   };
@@ -126,13 +143,15 @@ const SiparisEkleForm = () => {
 
       // Sadece şablon kullanılmıyorsa görevleri ve bağımlılıkları gönder
       if (!sablonKullan || !selectedKategori) {
-        siparisData.gorevler = gorevler;
+        siparisData.gorevler = gorevler.map(gorev => {
+          const { tempId, sablondan, originalSablonId, ...cleanGorev } = gorev;
+          return cleanGorev;
+        });
         siparisData.bagimliliklar = bagimliliklar.map(b => {
-          const { id, ...cleanBagimlilik } = b;
+          const { id, originalBagimlilikId, oncuKategoriGorevSablonuId, ardilKategoriGorevSablonuId, ...cleanBagimlilik } = b;
           return cleanBagimlilik;
         });
       }
-      // Şablon kullanılıyorsa backend kategoriId'den görevleri otomatik oluşturacak
 
       console.log('Gönderilecek sipariş verisi:', siparisData);
 
@@ -315,13 +334,13 @@ const SiparisEkleForm = () => {
 
           {/* Görev Yönetimi */}
           <GorevYoneticisi
-            gorevler={gorevler}
-            bagimliliklar={bagimliliklar}
+            gorevler={gorevler || []}
+            bagimliliklar={bagimliliklar || []}
             onChange={handleGorevlerChange}
             onBagimlilikEkle={handleBagimlilikEkle}
             onBagimlilikSil={handleBagimlilikSil}
             kategoriId={selectedKategori}
-            sablonKullan={sablonKullan}
+            sablonKullan={sablonKullan || false}
           />
 
           <Divider />

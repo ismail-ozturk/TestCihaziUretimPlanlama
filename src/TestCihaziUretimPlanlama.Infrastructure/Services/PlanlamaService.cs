@@ -208,54 +208,7 @@ namespace TestCihaziUretimPlanlama.Infrastructure.Services
             }
         }
 
-        private async Task SiparisiMevcutAtamalarlaYenidenPlanlaAsync(int siparisId, Dictionary<int, int> mevcutAtamalar)
-        {
-            var siparis = await _context.Siparisler
-                .Include(s => s.UretimGorevleri)
-                    .ThenInclude(ug => ug.Gorev)
-                        .ThenInclude(g => g.Departman)
-                .Include(s => s.UretimGorevleri)
-                    .ThenInclude(ug => ug.OncuBagimliliklar)
-                .Include(s => s.UretimGorevleri)
-                    .ThenInclude(ug => ug.ArdilBagimliliklar)
-                .FirstOrDefaultAsync(s => s.Id == siparisId);
-
-            if (siparis == null) return;
-
-            // Sadece beklemedeki görevleri al (sıfırlanmış olanlar)
-            var bekleyenGorevler = siparis.UretimGorevleri
-                .Where(g => g.Durum == GorevDurum.Beklemede)
-                .ToList();
-
-            if (!bekleyenGorevler.Any()) return;
-
-            var siralanmisGorevler = TopolojikSiralama(bekleyenGorevler);
-            var siparisPersonelAtamalari = new Dictionary<int, int>(); // DepartmanId -> PersonelId
-
-            // Mevcut atamaları sipariş personel atamalarına aktar
-            foreach (var gorev in siralanmisGorevler)
-            {
-                if (mevcutAtamalar.ContainsKey(gorev.Id))
-                {
-                    var departmanId = gorev.Gorev.DepartmanId;
-                    var personelId = mevcutAtamalar[gorev.Id];
-
-                    if (!siparisPersonelAtamalari.ContainsKey(departmanId))
-                    {
-                        siparisPersonelAtamalari[departmanId] = personelId;
-                    }
-                }
-            }
-
-            // Her görevi mevcut GoreviSiraliPlanlaAsync metodu ile planla
-            foreach (var gorev in siralanmisGorevler)
-            {
-                await GoreviSiraliPlanlaAsync(gorev, siparisPersonelAtamalari);
-            }
-
-            siparis.Durum = SiparisDurum.Planli;
-            Console.WriteLine($"DEBUG: {siparis.UretimNumarasi} planlandı");
-        }
+ 
         public async Task<IEnumerable<UretimGorevi>> GetPersonelPlaniniAsync(int personelId, DateTime baslangic, DateTime bitis)
         {
             return await _context.UretimGorevleri
